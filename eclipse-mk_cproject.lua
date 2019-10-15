@@ -7,14 +7,22 @@
 	function premake.modules.eclipse_mk.cproject.generate_config(prj, configName, baseUID, _id)
 		local myId = _id()
 		local tchId = _id()
+		local gccPaths = {}
+		local gppPaths = {}
+		
+		if premake.modules.armgcc ~= nil then
+			gccPaths = premake.modules.armgcc.includepaths("gcc")
+			gppPaths = premake.modules.armgcc.includepaths("g++")
+		end
+		
 		if baseUID then
 			myId = baseUID .. "." .. myId
 		end
 		if not configName then
-			makeArgs = ""
+			makeArgs = ' arguments="eclipse-mk-build" command="premake5"'
 			configName = "Default"
 		else
-			makeArgs = ' arguments="config=' .. configName:lower() .. '" command="make"'
+			makeArgs = ' arguments="eclipse-mk-build ' .. configName:lower() .. '" command="premake5"'
 		end
 	
 		_p(2, 	'<cconfiguration id="0.%s">', myId)
@@ -40,12 +48,27 @@
 		_p(7,					'<tool id="org.eclipse.cdt.build.core.settings.holder.libs.%d" name="holder for library settings" superClass="org.eclipse.cdt.build.core.settings.holder.libs"/>', _id())
 		_p(7,					'<tool id="org.eclipse.cdt.build.core.settings.holder.%d" name="Assembly" superClass="org.eclipse.cdt.build.core.settings.holder">', _id())
 		_p(8,						'<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.%d" languageId="org.eclipse.cdt.core.assembly" languageName="Assembly" sourceContentType="org.eclipse.cdt.core.asmSource" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>', _id())
+		_p(8,                       '<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.%d" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">', _id())
+		for _, p in ipairs(gccPaths) do			
+			_p(9,                       '<listOptionValue builtIn="false" value="&quot;%s&quot;"/>', p)
+		end
+		_p(8,      					'</option>')
 		_p(7,					'</tool>')
 		_p(7,					'<tool id="org.eclipse.cdt.build.core.settings.holder.%d" name="GNU C++" superClass="org.eclipse.cdt.build.core.settings.holder">', _id())
 		_p(8,						'<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.%d" languageId="org.eclipse.cdt.core.g++" languageName="GNU C++" sourceContentType="org.eclipse.cdt.core.cxxSource,org.eclipse.cdt.core.cxxHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>', _id())
+		_p(8,                       '<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.%d" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">', _id())
+		for _, p in ipairs(gppPaths) do			
+			_p(9,                       '<listOptionValue builtIn="false" value="&quot;%s&quot;"/>', p)
+		end
+		_p(8,      					'</option>')
 		_p(7,					'</tool>')
 		_p(7,					'<tool id="org.eclipse.cdt.build.core.settings.holder.%d" name="GNU C" superClass="org.eclipse.cdt.build.core.settings.holder">', _id())
 		_p(8,						'<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.%d" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>', _id())
+		_p(8,                       '<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.%d" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">', _id())
+		for _, p in ipairs(gccPaths) do			
+			_p(9,                       '<listOptionValue builtIn="false" value="&quot;%s&quot;"/>', p)
+		end
+		_p(8,      					'</option>')
 		_p(7,					'</tool>')
 		_p(6,				'</toolChain>')
 		_p(5,			'</folderInfo>')

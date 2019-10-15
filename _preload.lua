@@ -52,6 +52,27 @@
 			premake.filename = oldFileName
 		end
 	}
+	
+	newaction
+	{
+		trigger     = "eclipse-mk-build",
+		description = "Build the project from Eclipse CDT",
+		execute     = function ()
+			local conf = _G["_ARGS"][1]
+			print("(1/3) Generating fresh Makefile...")
+			os.execute("premake5 gmake2")
+						
+			if conf == nil then
+				print("(2/3) Building Makefile with default...")
+				os.execute("make")
+			else
+				conf = conf:lower()
+				print("(2/3) Building Makefile with config '" .. conf .. "'...")
+				os.execute("make \"config=" .. conf .. "\"")
+			end
+			print("(3/3) All done!")
+		end
+	}
 
 --
 -- Decide when the full module should be loaded.
